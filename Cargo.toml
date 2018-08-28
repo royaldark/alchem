@@ -1,0 +1,9 @@
+cargo-features = ["edition"]
+
+[package]
+name = "alchem"
+version = "0.1.0"
+authors = ["Joe Einertson <jeinerts@umm>"]
+edition = '2018'
+
+[dependencies]
