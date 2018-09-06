@@ -1,5 +1,7 @@
 use super::elements::Atom;
+use std::clone::Clone;
 use std::collections::HashMap;
+use std::iter::FromIterator;
 
 /*
      -z
@@ -10,8 +12,8 @@ use std::collections::HashMap;
      +z
 */
 
-#[derive(Hash, PartialEq, Eq)]
-struct GridPosition {
+#[derive(Clone, Debug, Hash, PartialEq, Eq)]
+crate struct GridPosition {
     x: i8,
     y: i8,
     z: i8,
@@ -23,14 +25,45 @@ struct GridDirection {
     z: i8,
 }
 
-struct GridSpace {
+#[derive(Clone, Debug)]
+crate struct GridSpace {
     atom: Option<Atom>,
     selected: bool,
 }
 
-struct Grid {
+#[derive(Debug)]
+crate struct GridIterator<'a> {
+    spaces: Vec<(&'a GridPosition, &'a GridSpace)>,
+}
+
+impl GridIterator<'a> {
+    fn from_grid(grid: &'a Grid) -> Self {
+        let as_vec: Vec<(&GridPosition, &GridSpace)> = grid.spaces.iter().collect();
+        let mut spaces = as_vec.clone();
+        spaces.sort_unstable_by_key(|(p, _)| (p.z, p.x));
+
+        GridIterator { spaces }
+    }
+}
+
+impl Iterator for GridIterator<'a> {
+    type Item = (GridPosition, GridSpace);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        None
+    }
+}
+
+#[derive(Debug)]
+crate struct Grid {
     radius: u8,
     spaces: HashMap<GridPosition, GridSpace>,
+}
+
+impl Grid {
+    crate fn iter(&self) -> GridIterator<'_> {
+        GridIterator::from_grid(self)
+    }
 }
 
 static DIRECTIONS: [&GridDirection; 6] = [
@@ -41,10 +74,6 @@ static DIRECTIONS: [&GridDirection; 6] = [
     &GridDirection { x: -1, y: 0, z: 1 },
     &GridDirection { x: 0, y: -1, z: 1 },
 ];
-
-/*lazy_static! {
-
-}*/
 
 fn grid_add(pos: &GridPosition, dir: &GridDirection) -> GridPosition {
     GridPosition {
@@ -62,60 +91,57 @@ fn grid_scale(dir: &GridDirection, radius: i8) -> GridDirection {
     }
 }
 
-fn grid_ring(center: GridPosition, radius: i8) -> Vec<GridPosition> {
+fn grid_ring(center: &GridPosition, radius: i8) -> Vec<GridPosition> {
     let mut tiles: Vec<GridPosition> = Vec::new();
 
     let mut current = grid_add(&center, &grid_scale(DIRECTIONS[4], radius));
 
     for i in 0..6 {
         for j in 0..radius {
+            let new_current = grid_add(&current, DIRECTIONS[i]);
             tiles.push(current);
-            current = grid_add(&current, DIRECTIONS[i]);
+            current = new_current;
         }
     }
 
     tiles
 }
 
+fn grid_spiral(center: &GridPosition, radius: i8) -> Vec<GridPosition> {
+    let mut tiles: Vec<GridPosition> = vec![center.clone()];
+
+    for i in 1..=radius {
+        let mut ring = grid_ring(&center, i);
+        tiles.append(&mut ring);
+    }
+
+    tiles
+}
+
 impl Grid {
-    fn new(radius: u8) -> Grid {
-        let mut spaces: HashMap<GridPosition, GridSpace> = HashMap::new();
+    crate fn new(radius: u8) -> Grid {
+        let home = GridPosition { x: 0, y: 0, z: 0 };
 
-        let mut x = 1;
-        let mut y = -1;
-        let mut z = 0;
+        let first_ring = grid_ring(&home, 1);
+        let second_ring = grid_ring(&home, 2);
 
-        // 1. (1, 0, -1)
-        // 2. (1, -1, 0)
-        // 3. (0, -1, 1)
-        // 4. (-1, 0, 1)
-        // 5. (-1, 1, 0)
-        // 6. (0, 1, -1)
+        println!("Ring 1: {:?}", first_ring);
+        println!("Ring 2: {:?}", second_ring);
 
-        // 0 -1 -1 0 1 1
-        // -1 0 1 1 0 -1
+        let spiral = grid_spiral(&home, 3);
 
-        // key:
-        // 1 1 0 -1 -1 0
+        println!("Circle: {:?}", spiral);
 
-        let deltas = [1, 1, 0, -1, -1, 0].iter().cycle();
-        let mut i = 0;
-
-        loop {
-            assert!(x + y + z == 0);
-
-            spaces.insert(
-                GridPosition { x, y, z },
-                GridSpace {
-                    atom: None,
-                    selected: false,
-                },
-            );
-
-            // x += deltas[i]
-            // y += deltas[i + 2]
-            // z += deltas[i + 4]
-        }
+        let spaces: HashMap<GridPosition, GridSpace> =
+            HashMap::from_iter(spiral.into_iter().map(|x| {
+                (
+                    x,
+                    GridSpace {
+                        atom: None,
+                        selected: false,
+                    },
+                )
+            }));
 
         Grid { radius, spaces }
     }

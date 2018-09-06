@@ -1,5 +1,6 @@
 use std::fmt::{Display, Formatter};
 
+#[derive(Clone, Debug)]
 crate enum Element {
     Fire,
     Water,
@@ -17,6 +18,7 @@ crate enum Element {
     Mors,
 }
 
+#[derive(Clone, Debug)]
 crate struct Atom {
     element: Element,
 }

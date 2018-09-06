@@ -23,15 +23,21 @@ fn main() {
         elements::Element::Mors,
     ];
 
-    /*for element in elements {
-        println!("{}", element);
-    }*/
-
-    /*println!(
-        "{}",
-        elements::SimpleBond {
-            left: elements::Element::Copper,
-            right: elements::Element::Salt,
-        }
-    );*/
+    println!("{:?}", game::Grid::new(4));
+    println!("{:?}", game::Grid::new(4).iter());
 }
+
+//
+//     _/ \
+//    / \_/
+//    \_/ \
+//      \_/
+//
+//       _____
+//      /     \
+//     /       \
+//     \       /
+//      \_____/
+//
+//
+//
