@@ -3,6 +3,8 @@ use std::clone::Clone;
 use std::collections::HashMap;
 use std::iter::FromIterator;
 
+use wasm_bindgen::prelude::*;
+
 /*
      -z
   +y  |  +x
@@ -54,6 +56,7 @@ impl<'a> Iterator for GridIterator<'a> {
     }
 }
 
+#[wasm_bindgen]
 #[derive(Debug)]
 pub struct Grid {
     radius: u8,
@@ -118,7 +121,9 @@ fn grid_spiral(center: &GridPosition, radius: i8) -> Vec<GridPosition> {
     tiles
 }
 
+#[wasm_bindgen]
 impl Grid {
+    #[wasm_bindgen(constructor)]
     pub fn new(radius: u8) -> Grid {
         let home = GridPosition { x: 0, y: 0, z: 0 };
 
@@ -146,3 +151,6 @@ impl Grid {
         Grid { radius, spaces }
     }
 }
+
+//#[wasm_bindgen]
+//pub fn 

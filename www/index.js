@@ -1,3 +1,5 @@
 import * as wasm from "alchem";
 
-wasm.greet();
+let x = new wasm.Grid(4);
+
+console.log(x);
