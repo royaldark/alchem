@@ -1,7 +1,7 @@
 use std::fmt::{Display, Formatter};
 
 #[derive(Clone, Debug)]
-crate enum Element {
+pub enum Element {
     Fire,
     Water,
     Earth,
@@ -19,7 +19,7 @@ crate enum Element {
 }
 
 #[derive(Clone, Debug)]
-crate struct Atom {
+pub struct Atom {
     element: Element,
 }
 
@@ -69,13 +69,13 @@ impl Atom {
     }
 }
 
-/*crate struct SimpleBond<T, U>
+/*pub struct SimpleBond<T, U>
 where
     T: Atom,
     U: Atom,
 {
-    crate left: T,
-    crate right: U,
+    pub left: T,
+    pub right: U,
 }
 
 impl<T, U> Display for SimpleBond<T, U>

@@ -13,7 +13,7 @@ use std::iter::FromIterator;
 */
 
 #[derive(Clone, Debug, Hash, PartialEq, Eq)]
-crate struct GridPosition {
+pub struct GridPosition {
     x: i8,
     y: i8,
     z: i8,
@@ -26,17 +26,17 @@ struct GridDirection {
 }
 
 #[derive(Clone, Debug)]
-crate struct GridSpace {
+pub struct GridSpace {
     atom: Option<Atom>,
     selected: bool,
 }
 
 #[derive(Debug)]
-crate struct GridIterator<'a> {
+pub struct GridIterator<'a> {
     spaces: Vec<(&'a GridPosition, &'a GridSpace)>,
 }
 
-impl GridIterator<'a> {
+impl<'a> GridIterator<'a> {
     fn from_grid(grid: &'a Grid) -> Self {
         let as_vec: Vec<(&GridPosition, &GridSpace)> = grid.spaces.iter().collect();
         let mut spaces = as_vec.clone();
@@ -46,7 +46,7 @@ impl GridIterator<'a> {
     }
 }
 
-impl Iterator for GridIterator<'a> {
+impl<'a> Iterator for GridIterator<'a> {
     type Item = (GridPosition, GridSpace);
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -55,13 +55,13 @@ impl Iterator for GridIterator<'a> {
 }
 
 #[derive(Debug)]
-crate struct Grid {
+pub struct Grid {
     radius: u8,
     spaces: HashMap<GridPosition, GridSpace>,
 }
 
 impl Grid {
-    crate fn iter(&self) -> GridIterator<'_> {
+    pub fn iter(&self) -> GridIterator<'_> {
         GridIterator::from_grid(self)
     }
 }
@@ -97,7 +97,7 @@ fn grid_ring(center: &GridPosition, radius: i8) -> Vec<GridPosition> {
     let mut current = grid_add(&center, &grid_scale(DIRECTIONS[4], radius));
 
     for i in 0..6 {
-        for j in 0..radius {
+        for _ in 0..radius {
             let new_current = grid_add(&current, DIRECTIONS[i]);
             tiles.push(current);
             current = new_current;
@@ -119,7 +119,7 @@ fn grid_spiral(center: &GridPosition, radius: i8) -> Vec<GridPosition> {
 }
 
 impl Grid {
-    crate fn new(radius: u8) -> Grid {
+    pub fn new(radius: u8) -> Grid {
         let home = GridPosition { x: 0, y: 0, z: 0 };
 
         let first_ring = grid_ring(&home, 1);
